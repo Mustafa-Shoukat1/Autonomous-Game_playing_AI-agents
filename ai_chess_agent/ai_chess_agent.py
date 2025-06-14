@@ -1,8 +1,24 @@
+"""
+Chess Agent with AutoGen Framework
+---------------------------------
+This application demonstrates an autonomous chess game played entirely by AI agents
+using the AutoGen framework. It features:
+
+1. A visual chess board rendered with chess.svg
+2. Two AI agents: one controlling white pieces, one controlling black
+3. A game master agent that validates moves and maintains game state
+4. Interactive UI with Streamlit for configuration and visualization
+
+The agents communicate with each other and make decisions based on the current board state,
+available legal moves, and chess strategy knowledge.
+"""
+
 import chess
 import chess.svg
 import streamlit as st
 from autogen import ConversableAgent, register_function
 
+# Initialize session state variables for persistence across Streamlit reruns
 if "openai_api_key" not in st.session_state:
     st.session_state.openai_api_key = None
 if "board" not in st.session_state:
@@ -16,6 +32,7 @@ if "move_history" not in st.session_state:
 if "max_turns" not in st.session_state:
     st.session_state.max_turns = 5
 
+# Streamlit sidebar for configuration
 st.sidebar.title("Chess Agent Configuration")
 openai_api_key = st.sidebar.text_input("Enter your OpenAI API key:", type="password")
 if openai_api_key:
@@ -43,10 +60,29 @@ if max_turns_input:
 st.title("Chess with AutoGen Agents")
 
 def available_moves() -> str:
+    """
+    Returns a formatted string of all legal moves in the current board position.
+    
+    Returns:
+        str: Comma-separated list of all legal moves in algebraic notation
+    """
     available_moves = [str(move) for move in st.session_state.board.legal_moves]
     return "Available moves are: " + ",".join(available_moves)
 
 def execute_move(move: str) -> str:
+    """
+    Executes a given move on the chess board.
+    
+    This function updates the board state, generates a visual representation of the move,
+    and provides a descriptive summary of the move. It also checks for game-ending conditions
+    like checkmate, stalemate, and insufficient material.
+    
+    Args:
+        move (str): The move to be executed, in UCI format (e.g., 'e2e4').
+    
+    Returns:
+        str: A description of the move made, including piece information and game status.
+    """
     try:
         chess_move = chess.Move.from_uci(move)
         if chess_move not in st.session_state.board.legal_moves:
@@ -89,6 +125,17 @@ def execute_move(move: str) -> str:
         return f"Invalid move format: {move}. Please use UCI format (e.g., 'e2e4')."
 
 def check_made_move(msg):
+    """
+    Checks and resets the made_move flag in the session state.
+    
+    This function is used as a termination message checker for the Game Master agent.
+    
+    Args:
+        msg: The message object from the agent's chat.
+    
+    Returns:
+        bool: True if a move was made and the flag was reset, False otherwise.
+    """
     if st.session_state.made_move:
         st.session_state.made_move = False
         return True
