@@ -3,16 +3,22 @@ from typing import List, Optional, Tuple
 import streamlit as st
 
 # Define constants for players
-X_PLAYER = "X"
-O_PLAYER = "O"
-EMPTY = " "
+X_PLAYER = "X"  # First player symbol
+O_PLAYER = "O"  # Second player symbol
+EMPTY = " "     # Empty cell representation
 
 
 class TicTacToeBoard:
+    """
+    A class representing the Tic-Tac-Toe game board and game logic.
+    
+    This class handles the game state, valid moves, win conditions, and 
+    provides methods for AI agents to interact with the game.
+    """
     def __init__(self):
         # Initialize empty 3x3 board
         self.board = [[EMPTY for _ in range(3)] for _ in range(3)]
-        self.current_player = X_PLAYER
+        self.current_player = X_PLAYER  # X always starts in traditional Tic-Tac-Toe
 
     def make_move(self, row: int, col: int) -> Tuple[bool, str]:
         """
@@ -50,6 +56,12 @@ class TicTacToeBoard:
     def get_board_state(self) -> str:
         """
         Returns a string representation of the current board state.
+        
+        This method creates a visual representation of the board with separators
+        that can be used in console output or for AI agent prompt context.
+        
+        Returns:
+            str: Formatted string showing the current board state
         """
         board_str = "\n-------------\n"
         for row in self.board:
